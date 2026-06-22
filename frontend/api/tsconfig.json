@@ -1,0 +1,16 @@
+{
+  "comment": "Typecheck-only config for the serverless functions. The Vite app tsconfig (../tsconfig.json) intentionally only covers src/; Vercel builds these functions separately. Run: npx tsc -p api/tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "isolatedModules": true
+  },
+  "include": ["*.ts"]
+}

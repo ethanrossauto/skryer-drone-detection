@@ -1,0 +1,7 @@
+fastapi>=0.118
+uvicorn[standard]>=0.34
+pydantic>=2.12
+paho-mqtt>=2.1   # planned internal sensor bus; not wired up yet in the mock scaffold
+anthropic>=0.40  # LLM threat-briefing layer (app/briefing.py)
+python-dotenv>=1.0   # load ANTHROPIC_API_KEY from a gitignored .env
+pytest>=8.0      # dev/test: the briefing eval suite (tests/test_briefing.py)

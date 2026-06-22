@@ -1,0 +1,55 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- C/C++ (Teensy DoA host build) ---
+*.o
+*.obj
+hardware/firmware/skryer_doa/selftest
+
+# --- Bench-test output ---
+bench_log*.csv
+
+# --- Node / frontend ---
+node_modules/
+.next/
+out/
+.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Env / secrets ---
+.env
+.env.*
+!.env.example
+*.local
+
+# --- Data / captures (don't commit raw RF/audio/video) ---
+data/
+captures/
+*.bin
+*.iq
+*.wav
+*.mp4
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+.vercel
