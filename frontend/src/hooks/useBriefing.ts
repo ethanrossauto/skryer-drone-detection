@@ -12,8 +12,9 @@ const DEMO = import.meta.env.VITE_DEMO_MODE === "1";
 const HTTP_URL = import.meta.env.VITE_BRIEFING_URL ?? "/api/briefing";
 
 // Don't re-brief on every tick: only on a material picture change, debounced to
-// this interval — the same throttle the Python `/ws/briefing` loop applies.
-const MIN_INTERVAL_MS = 5000;
+// this interval (≥10 s between briefings) — keeps the panel readable and the API
+// spend low.
+const MIN_INTERVAL_MS = 10_000;
 const SKY_CLEAR = "Sky clear, no contacts.";
 
 export interface BriefingState {

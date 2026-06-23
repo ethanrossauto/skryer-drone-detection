@@ -67,6 +67,41 @@ body,
   color: #ff6b6b;
 }
 
+.panel__ptz {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.panel__ptz-cam {
+  color: #3ee6a0;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.panel__ptz-target {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.panel__ptz-mode {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.panel__ptz-mode--auto {
+  color: #3ee6a0;
+}
+.panel__ptz-mode--manual {
+  color: #ffcc33;
+}
+.panel__ptz-hint {
+  color: var(--muted);
+  font-size: 11px;
+}
+
 .panel__count {
   padding: 10px 16px;
   font-size: 12px;
@@ -89,9 +124,15 @@ body,
   gap: 8px;
   padding: 8px 16px;
   font-size: 13px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
 }
 .track:hover {
   background: rgba(255, 255, 255, 0.03);
+}
+.track--ptz {
+  background: rgba(62, 230, 160, 0.08);
+  border-left-color: #3ee6a0;
 }
 
 .track__kind {
@@ -168,4 +209,63 @@ body,
   margin: 6px 0 0;
   font-size: 11px;
   color: #ffcc33;
+}
+
+/* --- Map legend (bottom-left overlay) --- */
+.legend {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.legend__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend__icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+/* --- Mobile: map is the hero; the panel docks as a bottom sheet --- */
+/* The desktop layout floats a 300px full-height sidebar, which on a phone covers
+   most of the screen. Below 640px, unpin the panel from full height and dock it to
+   the bottom as a short sheet (track list scrolls inside), so the map owns the top. */
+@media (max-width: 640px) {
+  .panel {
+    top: auto; /* unpin from full height */
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto; /* full width minus margins */
+    max-height: 48vh; /* never dominate the screen; tracklist scrolls within */
+  }
+
+  /* The legend lives bottom-right on desktop, where it would now sit under the
+     bottom sheet — move it to the top-right and shrink it. */
+  .legend {
+    top: 8px;
+    right: 8px;
+    bottom: auto;
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+  .legend__icon {
+    width: 16px;
+    height: 16px;
+  }
 }

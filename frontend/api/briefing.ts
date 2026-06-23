@@ -37,15 +37,6 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response("forbidden", { status: 403, headers: TEXT });
   }
 
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "anon";
-  const limit = await checkLimits(ip);
-  if (!limit.ok) {
-    return new Response(limit.reason ?? "rate_limited", { status: 429, headers: TEXT });
-  }
-
   let contacts: Contact[] = [];
   try {
     const body = (await req.json()) as { contacts?: unknown };
@@ -55,9 +46,21 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response("bad request", { status: 400, headers: TEXT });
   }
 
-  // Empty sky: answer locally, no model call (can't fail, costs nothing).
+  // Empty sky: answer locally, no model call (can't fail, costs nothing). Checked
+  // BEFORE the rate limit so it never counts against a visitor's per-IP briefing cap.
   if (contacts.length === 0) {
     return new Response(SKY_CLEAR, { headers: TEXT });
+  }
+
+  // Only real, model-hitting briefings count toward the ~10-per-visitor cap and the
+  // global daily budget.
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "anon";
+  const limit = await checkLimits(ip);
+  if (!limit.ok) {
+    return new Response(limit.reason ?? "rate_limited", { status: 429, headers: TEXT });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;

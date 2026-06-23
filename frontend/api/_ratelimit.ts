@@ -1,7 +1,11 @@
 // Abuse protection for the public briefing endpoint. The endpoint calls a paid LLM,
 // so a public URL needs a real cap. Two layers, both backed by Upstash Redis (free
 // tier, edge-compatible REST):
-//   1. per-IP sliding window — stops one client looping the endpoint.
+//   1. per-IP total cap — ~10 briefings per visitor per day. This is a TOTAL over a
+//      long window, not a per-minute rate: a casual look gets ~10 refreshes, but no
+//      single visitor (or looping script) can keep pulling briefings indefinitely.
+//      Only paid briefings count toward it — the caller checks limits after the
+//      empty-sky short-circuit, so "Sky clear" (no model call) is free.
 //   2. a global daily budget — a hard ceiling on total briefings/day, so even broad
 //      abuse can't run up an unbounded bill.
 //
@@ -18,10 +22,21 @@ import { Redis } from "@upstash/redis";
 const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
 
-// Tunables (override via env on Vercel).
-const PER_IP = Number(process.env.SKRYER_IP_LIMIT ?? "12"); // requests / window
-const WINDOW = (process.env.SKRYER_IP_WINDOW ?? "60 s") as `${number} ${"s" | "m"}`;
+// Tunables (override via env on Vercel; a redeploy applies the new values).
+// PER_IP is a TOTAL over WINDOW, so 10 / "1 d" ≈ ten paid briefings per visitor/day.
+const PER_IP = Number(process.env.SKRYER_IP_LIMIT ?? "10"); // paid briefings / window
+const WINDOW = (process.env.SKRYER_IP_WINDOW ?? "1 d") as `${number} ${"s" | "m" | "h" | "d"}`;
 const DAILY_BUDGET = Number(process.env.SKRYER_DAILY_BUDGET ?? "500"); // briefings / day
+
+// Owner/operator IPs that bypass ALL caps (per-IP + daily budget). Set via the
+// SKRYER_IP_ALLOWLIST env (comma-separated) so real IPs never live in code/git —
+// keeps Ethan's own demoing from being rate-limited. Empty by default.
+const ALLOWLIST = new Set(
+  (process.env.SKRYER_IP_ALLOWLIST ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
+);
 
 const redis = url && token ? new Redis({ url, token }) : null;
 const ipLimiter = redis
@@ -39,6 +54,9 @@ export interface LimitResult {
 }
 
 export async function checkLimits(ip: string): Promise<LimitResult> {
+  // Allowlisted owner IP → bypass everything (no per-IP cap, no budget increment).
+  if (ALLOWLIST.has(ip)) return { ok: true };
+
   // No store configured → rely on the client throttle + max_tokens. Allow.
   if (!redis || !ipLimiter) return { ok: true };
 

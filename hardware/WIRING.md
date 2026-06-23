@@ -100,7 +100,8 @@ plain 3.3V UART — **both boards are 3.3V logic, so connect directly, no level 
   wired to (pick a free pair in the Meshtastic config; confirm against your Heltec V3 pinout). The
   sketch currently emits a compact `B,<az>,<sharpness>` CSV line — match it to the Serial module's
   framing (e.g. TEXTMSG mode) when you configure the radio.
-- **Wire budget:** 3 UART wires/node × 3 nodes = 9 leads, on top of the mic-array leads — all F/F.
+- **Wire budget:** 3 UART wires/node × 3 nodes = 9 leads, on top of the mic-array leads — all F/F,
+  covered by the RobotShop jumper count (see SHOPPING-LIST.md → "Jumpers").
 
 ## Notes
 
