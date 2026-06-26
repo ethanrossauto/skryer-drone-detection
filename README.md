@@ -8,6 +8,8 @@ nodes** each hears a drone and computes a bearing; the bearings are **triangulat
 with range**, and a **ground/mast PTZ camera** slews to confirm and identify the threat. Built in
 public as a portfolio piece, AI-assisted end to end.
 
+![Skryer operator console — satellite map with sensor nodes, triangulated drone tracks and bearing cones, plus the streamed threat-briefing panel, running live at skryer.ca](frontend/public/og-image.png)
+
 **Live demo:** [skryer.ca](https://skryer.ca) — the operator console running on a built-in mock
 contact source (no hardware required), including the streamed LLM operator briefing.
 
